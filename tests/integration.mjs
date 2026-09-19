@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+const origin=process.env.TEST_ORIGIN||'http://127.0.0.1:4321',tag=Date.now().toString(36);
+const req=async(path,method='GET',body,identity)=>{const response=await fetch(origin+path,{method,headers:{...(method==='GET'?{}:{Origin:origin,'X-Requested-With':'IEEE-IMSIU','Content-Type':'application/json'}),...(identity?{'X-Dev-Email':identity}:{})},body:body===undefined?undefined:JSON.stringify(body)});return {status:response.status,data:await response.json()};};
+const state=async identity=>(await req('/api/admin/state','GET',undefined,identity)).data;
+const patch=async changes=>req('/api/admin/state','PATCH',{version:(await state()).version,changes});
+assert.equal((await req('/api/admin/state','GET',undefined,'unknown@example.test')).status,403);
+const e={id:'event-'+tag,title:'Integration event',description:'Testing persistence',date:'2026-10-01',time:'17:00',end:'2026-10-01',endTime:'19:00',location:'IMSIU',image:'data.webp',status:'published',registration:'open',mode:'review',capacity:2,waitlist:true,fields:[{label:'الاسم',type:'text',required:true},{label:'البريد الإلكتروني',type:'email',required:true},{label:'رقم الجوال',type:'tel',required:true}]};
+assert.equal((await patch([{kind:'events',id:e.id,value:e}])).status,200);
+assert.ok((await state()).state.events.some(x=>x.id===e.id));
+assert.equal((await fetch(origin+'/api/admin/state',{method:'PATCH',headers:{'Content-Type':'application/json'},body:'{}'})).status,403);
+assert.equal((await patch([{kind:'events',id:e.id,value:{...e,endTime:'16:00'}}])).status,422);
+const snapshot=await state(),input={version:snapshot.version,changes:[{kind:'events',id:e.id,value:{...e,title:'Version check'}}]};assert.equal((await req('/api/admin/state','PATCH',input)).status,200);assert.equal((await req('/api/admin/state','PATCH',input)).status,409);
+assert.equal((await req('/api/public/submit','POST',{kind:'registrations',target:e.id,token:'',values:{}})).status,422);
+const email=`integration-${tag}@example.com`,submission={kind:'registrations',target:e.id,token:'',values:{0:'Integration Student',1:email,2:'0500000000'}};
+const submitted=await req('/api/public/submit','POST',submission);assert.equal(submitted.status,201);assert.equal(submitted.data.status,'new');assert.equal((await req('/api/public/submit','POST',submission)).status,409);
+assert.equal((await fetch(origin+'/')).status,200);assert.equal((await fetch(origin+'/events/'+e.id)).status,200);assert.equal((await fetch(origin+'/robots.txt').then(r=>r.text())).includes('Disallow: /admin'),true);
+console.log('PASS: D1 persistence, authorization, validation, stale-write conflict, public submission and public pages');

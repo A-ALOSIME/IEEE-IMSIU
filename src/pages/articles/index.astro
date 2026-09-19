@@ -1,0 +1,4 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';import {articleImage,publicState,published} from '../../lib/public-data';const articles=published((await publicState()).articles);
+---
+<BaseLayout title="المقالات | IEEE IMSIU"><section class="section"><div class="container"><div class="section-heading"><div><p class="eyebrow">محتوى طلابي</p><h1>المقالات</h1><p>معرفة تقنية وتجارب نكتبها من قلب المجتمع.</p></div></div>{articles.length?<div class="grid">{articles.map(article=><a class="card" href={`/articles/${article.slug}`}><div class="card-media"><img src={articleImage(article)} alt={String(article.alt||article.title)}></div><div class="card-body"><span class="pill">{String(article.category)}</span><h2>{String(article.title)}</h2><p>{String(article.excerpt||'')}</p></div></a>)}</div>:<div class="empty"><h2>لا توجد مقالات منشورة الآن</h2></div>}</div></section></BaseLayout>

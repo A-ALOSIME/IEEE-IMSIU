@@ -1,0 +1,17 @@
+---
+import '../styles/global.css';
+import {activeAnnouncement,publicState} from '../lib/public-data';
+const {title='IEEE IMSIU',description='الفرع الطلابي لـ IEEE في جامعة الإمام محمد بن سعود الإسلامية',lang='ar'}=Astro.props;const isEn=lang==='en';
+const state=await publicState();const announcement=activeAnnouncement(state);
+---
+<!doctype html><html lang={lang} dir={isEn?'ltr':'rtl'} data-theme="light"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content={description}>
+<meta name="theme-color" content="#2f6d9e"><title>{title}</title><link rel="icon" href="/admin/assets/IEEE-Logo-Color.png">
+<script type="module" src="/site.mjs"></script><slot name="head" />
+</head><body>
+<a class="skip" href="#content">{isEn?'Skip to content':'تجاوز إلى المحتوى'}</a>
+{announcement&&!isEn&&<aside class="announcement"><span>{String(announcement.title)} — {String(announcement.text)}</span>{announcement.url&&<a href={String(announcement.url)}>{String(announcement.button||'التفاصيل')}</a>}</aside>}
+<header class="site-header"><a class="brand" href={isEn?'/en/':'/'}><img src="/admin/assets/IEEE-Logo-Color.png" alt="IEEE"><span><b>IEEE IMSIU</b><small>Student Branch</small></span></a><button class="menu-button" type="button" aria-controls="site-nav" aria-expanded="false">{isEn?'Menu':'القائمة'}</button><nav id="site-nav" aria-label={isEn?'Main navigation':'التنقل الرئيسي'}>{isEn?<><a href="/en/">Home</a><a href="/events">Events</a><a href="/join">Join</a><a href="/articles">Articles</a><a href="/impact">Impact</a><a href="/about">About</a></>:<><a href="/">الرئيسية</a><a href="/events">الفعاليات</a><a href="/join">انضم إلينا</a><a href="/articles">المقالات</a><a href="/impact">أثرنا</a><a href="/about">عن النادي</a></>}<button type="button" class="icon-button" data-theme-toggle aria-label={isEn?'Change theme':'تبديل المظهر'}>◐</button><button type="button" class="lang-button" data-lang-toggle data-target={isEn?'/':'/en/'}>{isEn?'ع':'EN'}</button></nav></header>
+<main id="content"><slot /></main>
+<footer class="site-footer"><div><img src="/admin/assets/IEEE-Logo-White.png" alt="IEEE"><p>{isEn?'Student Branch at Imam Mohammad Ibn Saud Islamic University':'الفرع الطلابي في جامعة الإمام محمد بن سعود الإسلامية'}</p></div><div><b>{isEn?'Quick links':'روابط سريعة'}</b><a href="/events">{isEn?'Events':'الفعاليات'}</a><a href="/join">{isEn?'Membership':'العضوية'}</a><a href="/articles">{isEn?'Articles':'المقالات'}</a></div><div><b>{isEn?'Administration':'الإدارة'}</b><a href="/admin">{isEn?'Team sign in':'دخول الفريق'}</a><a href="/privacy">{isEn?'Privacy':'الخصوصية'}</a></div><p class="copyright">© {new Date().getFullYear()} IEEE IMSIU</p></footer>
+</body></html>

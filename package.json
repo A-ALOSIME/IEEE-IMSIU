@@ -1,0 +1,39 @@
+{
+  "name": "ieee-imsiu-website",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "astro build",
+    "check": "astro check && tsc --noEmit",
+    "test": "tsx --test tests/domain.test.ts",
+    "test:integration": "node tests/integration.mjs",
+    "test:browser": "node tests/browser.mjs",
+    "db:local": "wrangler d1 migrations apply ieee-imsiu --local",
+    "types": "wrangler types",
+    "deploy:check": "astro build && wrangler deploy --dry-run",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "14.3.2",
+    "@tailwindcss/vite": "4.3.3",
+    "astro": "7.3.3",
+    "jose": "6.2.12",
+    "resend": "6.28.1",
+    "sanitize-html": "2.17.7",
+    "tailwindcss": "4.3.3",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@types/node": "26.6.1",
+    "@types/sanitize-html": "2.16.1",
+    "playwright": "1.63.0",
+    "tsx": "4.23.13",
+    "typescript": "6.0.3"
+  }
+}

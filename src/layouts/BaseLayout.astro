@@ -1,0 +1,35 @@
+---
+import '../styles/global.css';
+import SocialLinks from '../components/SocialLinks.astro';
+import {activeAnnouncement,publicState} from '../lib/public-data';
+const {title='IEEE IMSIU',description='الفرع الطلابي لـ IEEE في جامعة الإمام محمد بن سعود الإسلامية'}=Astro.props;
+const state=await publicState(),announcement=activeAnnouncement(state),path=Astro.url.pathname;
+const links=[
+ {href:'/about',ar:'عن النادي',en:'About'},
+ {href:'/impact',ar:'الأثر',en:'Impact'},
+ {href:'/events',ar:'الفعاليات',en:'Events'},
+ {href:'/events/archive',ar:'سجل الفعاليات',en:'Events archive'},
+ {href:'/articles',ar:'المقالات',en:'Articles'},
+ {href:'/collaboration',ar:'تعاون معنا',en:'Partner with us'}
+];
+---
+<!doctype html><html lang="ar" dir="rtl" data-theme="light"><head>
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content={description}>
+ <meta name="theme-color" content="#eef6fb"><title>{title}</title><link rel="icon" href="/admin/assets/IEEE-Logo-Color.png">
+ <script is:inline src="/preference.js"></script>
+ <script type="module" src="/site.mjs"></script><slot name="head" />
+</head><body>
+ <a class="skip" href="#content" data-en="Skip to content">تجاوز إلى المحتوى</a>
+ {announcement&&<aside class="announcement"><span>{String(announcement.title)} — {String(announcement.text)}</span>{announcement.url&&<a href={String(announcement.url)}>{String(announcement.button||'التفاصيل')}</a>}</aside>}
+ <header class="site-header"><div class="header-inner">
+  <a class="brand" href="/" aria-label="IEEE IMSIU — الرئيسية"><img class="brand-color" src="/admin/assets/IEEE-Logo-Color.png" alt="IEEE IMSIU"><img class="brand-white" src="/admin/assets/IEEE-Logo-White.png" alt=""></a>
+  <button class="menu-button" type="button" aria-controls="site-nav" aria-expanded="false" data-en="Menu">القائمة</button>
+  <nav id="site-nav" aria-label="التنقل الرئيسي">{links.map(link=><a href={link.href} class:list={{active:path===link.href||link.href!=='/events'&&path.startsWith(link.href+'/')}} data-en={link.en}>{link.ar}</a>)}</nav>
+  <div class="header-actions"><button type="button" class="icon-button theme-toggle" data-theme-toggle aria-label="تبديل المظهر"><span class="sun"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg></span><span class="moon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.4 15.2A9 9 0 0 1 8.8 3.6a9 9 0 1 0 11.6 11.6Z"></path></svg></span></button><button type="button" class="lang-button" data-lang-toggle>EN</button><a class="button primary join-button" href="/join" data-en="Join us">انضم إلينا</a></div>
+ </div></header>
+ <main id="content"><slot /></main>
+ <footer class="site-footer"><div class="footer-main">
+  <div class="footer-brand"><a class="brand footer-logo" href="/"><img class="brand-color" src="/admin/assets/IEEE-Logo-Color.png" alt="IEEE IMSIU"><img class="brand-white" src="/admin/assets/IEEE-Logo-White.png" alt=""></a><p data-en="IEEE Student Branch at Imam Mohammad Ibn Saud Islamic University.">الفرع الطلابي لـ IEEE في جامعة الإمام محمد بن سعود الإسلامية.</p></div>
+  <div class="footer-contact"><a class="footer-email" href="mailto:ieeeclub.sa@gmail.com">ieeeclub.sa@gmail.com</a><SocialLinks /></div>
+ </div><div class="footer-bottom"><span>© {new Date().getFullYear()} IEEE IMSIU</span><div><a href="/privacy" data-en="Privacy policy">سياسة الخصوصية</a><a href="/admin" data-en="Administration">دخول الإدارة</a></div></div></footer>
+</body></html>

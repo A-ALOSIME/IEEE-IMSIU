@@ -1,0 +1,4 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';import {articleImage,publicState} from '../../lib/public-data';const article=(await publicState()).articles.find(row=>row.slug===Astro.params.slug&&row.status==='published');if(!article)return Astro.redirect('/articles',302);
+---
+<BaseLayout title={`${article.title} | IEEE IMSIU`} description={String(article.meta||article.excerpt||article.title)}><section class="section"><div class="container prose"><img class="hero-image" src={articleImage(article)} alt={String(article.alt||article.title)}><span class="pill">{String(article.category)}</span><h1>{String(article.title)}</h1><div class="meta"><span>{String(article.author)}</span><span>{String(article.date)}</span></div><article set:html={String(article.body)} /></div></section></BaseLayout>

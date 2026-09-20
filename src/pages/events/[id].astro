@@ -1,0 +1,17 @@
+---
+import {env} from 'cloudflare:workers';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DynamicForm from '../../components/DynamicForm.astro';
+import {eventImage,publicState} from '../../lib/public-data';
+import {archiveEvents,archiveImage} from '../../lib/archive';
+import {formatDate,formatTime} from '../../lib/format';
+const state=await publicState();
+const liveEvent=state.events.find(row=>row.id===Astro.params.id&&row.status==='published');
+const archivedEvent=archiveEvents.find(row=>row.id===Astro.params.id);
+if(!liveEvent&&!archivedEvent)return Astro.redirect('/events',302);
+const isArchived=!liveEvent&&Boolean(archivedEvent),event=liveEvent||archivedEvent!;
+const registration=Boolean(liveEvent&&liveEvent.registration==='open'&&liveEvent.mode!=='none');
+const image=liveEvent?eventImage(liveEvent):archiveImage(archivedEvent!);
+const date=liveEvent?`${formatDate(liveEvent.date)} · ${formatTime(liveEvent.time)} – ${formatTime(liveEvent.endTime)}`:archivedEvent!.date;
+---
+<BaseLayout title={`${event.title} | IEEE IMSIU`} description={String(('description' in event&&event.description)||('summary' in event&&event.summary)||event.title)}><section class="page-hero"><div class="container prose"><div class="breadcrumbs"><a href="/" data-en="Home">الرئيسية</a> / <a href={isArchived?'/events/archive':'/events'} data-en={isArchived?'Events archive':'Events'}>{isArchived?'سجل الفعاليات':'الفعاليات'}</a></div><p class="eyebrow" data-en={isArchived?'From the events archive':'IEEE IMSIU event'}>{isArchived?'من سجل الفعاليات':'فعالية IEEE IMSIU'}</p><h1 data-en={String(event.titleEn||event.title)}>{String(event.title)}</h1><div class="meta"><span>{date}</span>{liveEvent&&<span>{String(liveEvent.location||'')}</span>}</div></div></section><section class="section soft"><div class="container event-detail-grid"><img class="hero-image event-detail-image" src={image} alt={String(('alt' in event&&event.alt)||event.title)}><div class="event-detail-copy"><p class="eyebrow" data-en="About the experience">عن التجربة</p><h2 data-en={String(event.titleEn||event.title)}>{String(event.title)}</h2><p>{String(('description' in event&&event.description)||('summary' in event&&event.summary)||'')}</p>{archivedEvent&&<div class="tag-list">{archivedEvent.tags.map(tag=><span class="pill">{tag}</span>)}</div>}{archivedEvent&&<dl class="event-facts">{archivedEvent.speaker&&<div><dt data-en="Presented by">تقديم</dt><dd>{archivedEvent.speaker}</dd></div>}<div><dt data-en="Date">الموعد</dt><dd>{archivedEvent.date}</dd></div></dl>}{registration&&<><h2 data-en="Register for the event">سجّل في الفعالية</h2><DynamicForm kind="registrations" target={event.id} fields={liveEvent!.fields} siteKey={env.TURNSTILE_SITE_KEY}/></>}{liveEvent&&!registration&&<div class="empty"><p data-en="Registration is not available right now.">التسجيل غير متاح حاليًا.</p></div>}</div></div></section>{isArchived&&<section class="section"><div class="container cta-band"><h2 data-en="Keep exploring our experiences.">أكمل استكشاف<br/>تجارب النادي.</h2><a class="button primary" href="/events/archive" data-en="All experiences">كل التجارب</a></div></section>}</BaseLayout>

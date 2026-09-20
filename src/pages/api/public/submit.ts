@@ -1,0 +1,22 @@
+import type {APIRoute} from 'astro';
+import {env} from 'cloudflare:workers';
+import {z} from 'zod';
+import {commit,readState} from '../../../lib/db';
+import {boundedBody,failure,HttpError,jsonBody,respond} from '../../../lib/auth';
+import {personFromAnswers,rateLimit,readDynamicFields,verifyTurnstile} from '../../../lib/public';
+import {validateRecord,type Kind,type Row} from '../../../lib/domain';
+import {storeFile} from '../../../lib/files';
+const input=z.object({kind:z.enum(['registrations','applications']),target:z.string().min(1).max(100),token:z.string().max(3000),values:z.record(z.string(),z.union([z.string(),z.array(z.string())]))});
+export const POST:APIRoute=async({request})=>{const uploaded:string[]=[];try{
+ let raw:unknown,form:FormData|undefined;
+ if((request.headers.get('content-type')||'').startsWith('multipart/form-data')){const bytes=await boundedBody(request,12*1024*1024);form=await new Response(bytes,{headers:{'Content-Type':request.headers.get('Content-Type')||''}}).formData();let values:unknown;try{values=JSON.parse(String(form.get('values')||'{}'));}catch{throw new HttpError(400,'الطلب غير صالح.');}raw={kind:form.get('kind'),target:form.get('target'),token:form.get('token'),values};}else raw=await jsonBody(request,80000);
+ const parsed=input.parse(raw);await verifyTurnstile(env,request,parsed.token);const ip=request.headers.get('CF-Connecting-IP')||'local';await rateLimit(env,'submit:'+ip,10,3600);
+ let fileAnswers:Record<string,string>={};
+ for(let attempt=0;attempt<3;attempt++){const {state,version}=await readState(env.DB),targetKind=parsed.kind==='registrations'?'events':'cycles',target=state[targetKind].find(x=>x.id===parsed.target);if(!target||target.status==='archived'||target.registration&&target.registration!=='open'||target.status==='closed')throw new HttpError(404,'التقديم غير متاح حاليًا.');const answers=readDynamicFields(target.fields,parsed.values),person=personFromAnswers(target.fields,answers);if(!person.name||!person.email||!person.phone)throw new HttpError(422,'الاسم والبريد ورقم الجوال مطلوبة.');
+  const fileFields=(target.fields as Row[]).map((field,index)=>({field,index})).filter(x=>x.field.type==='file');if(fileFields.length>2)throw new HttpError(422,'عدد المرفقات أكبر من المسموح.');
+  if(form&&!Object.keys(fileAnswers).length)for(const {index} of fileFields){const file=form.get('file_'+index);if(file instanceof File&&file.size){const url=await storeFile(env,file,'private',person.email);uploaded.push(url);fileAnswers[String(index)]=url;}}
+  for(const {field,index} of fileFields){delete answers[String(index)];if(fileAnswers[String(index)])answers[String(index)]=fileAnswers[String(index)];else if(field.required)throw new HttpError(422,`الحقل «${field.label}» مطلوب.`);}
+  Object.assign(answers,fileAnswers);let requestStatus='new';if(parsed.kind==='registrations'&&target.mode==='direct'){const accepted=state.registrations.filter(x=>x.event===target.id&&x.status==='accepted').length;if(target.capacity&&accepted>=Number(target.capacity)&&!target.waitlist)throw new HttpError(409,'اكتمل عدد المقاعد.');requestStatus=!target.capacity||accepted<Number(target.capacity)?'accepted':'waitlist';}
+ const id=crypto.randomUUID(),rawRecord:Row={id,...person,date:new Date().toISOString().slice(0,10),status:requestStatus,answers,cv:Object.values(fileAnswers)[0],[parsed.kind==='registrations'?'event':'cycle']:target.id};const value=validateRecord(parsed.kind,rawRecord);try{await commit(env.DB,version,'public:'+person.email,[{kind:parsed.kind as Kind,id,value}]);return respond({id,status:requestStatus},201);}catch(error){if(/UNIQUE constraint failed: revisions.version/.test(error instanceof Error?error.message:''))continue;if(/UNIQUE constraint/.test(error instanceof Error?error.message:''))throw new HttpError(409,'سبق التسجيل بهذا البريد.');throw error;}}
+ throw new HttpError(409,'تعذر التسجيل بسبب تعديل متزامن. حاول مجددًا.');
+ }catch(error){for(const url of uploaded){const id=url.split('/').pop()!;const row=await env.DB.prepare('SELECT key FROM uploads WHERE id=?').bind(id).first<{key:string}>();if(row){await env.FILES.delete(row.key);await env.DB.prepare('DELETE FROM uploads WHERE id=?').bind(id).run();}}if(error instanceof z.ZodError){console.error(JSON.stringify({event:'public_form_invalid',issues:error.issues.map(issue=>({path:issue.path,code:issue.code}))}));return respond({error:'راجع بيانات النموذج.'},422);}return failure(error);}};

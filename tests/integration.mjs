@@ -14,4 +14,5 @@ assert.equal((await req('/api/public/submit','POST',{kind:'registrations',target
 const email=`integration-${tag}@example.com`,submission={kind:'registrations',target:e.id,token:'',values:{0:'Integration Student',1:email,2:'0500000000'}};
 const submitted=await req('/api/public/submit','POST',submission);assert.equal(submitted.status,201);assert.equal(submitted.data.status,'new');assert.equal((await req('/api/public/submit','POST',submission)).status,409);
 assert.equal((await fetch(origin+'/')).status,200);assert.equal((await fetch(origin+'/events/'+e.id)).status,200);assert.equal((await fetch(origin+'/robots.txt').then(r=>r.text())).includes('Disallow: /admin'),true);
+assert.equal((await patch([{kind:'events',id:e.id,value:{...e,title:'Version check',status:'archived',registration:'ended'}}])).status,200);
 console.log('PASS: D1 persistence, authorization, validation, stale-write conflict, public submission and public pages');

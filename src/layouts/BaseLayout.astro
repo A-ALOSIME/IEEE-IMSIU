@@ -25,7 +25,7 @@ const links=[
   <a class="brand" href="/" aria-label="IEEE IMSIU — الرئيسية"><img class="brand-color" src="/admin/assets/IEEE-Logo-Color.png" alt="IEEE IMSIU"><img class="brand-white" src="/admin/assets/IEEE-Logo-White.png" alt=""></a>
   <button class="menu-button" type="button" aria-controls="site-nav" aria-expanded="false" data-en="Menu">القائمة</button>
   <nav id="site-nav" aria-label="التنقل الرئيسي">{links.map(link=><a href={link.href} class:list={{active:path===link.href||link.href!=='/events'&&path.startsWith(link.href+'/')}} data-en={link.en}>{link.ar}</a>)}</nav>
-  <div class="header-actions"><button type="button" class="icon-button" data-theme-toggle aria-label="تبديل المظهر"><span class="sun">☼</span><span class="moon">☾</span></button><button type="button" class="lang-button" data-lang-toggle>EN</button><a class="button primary join-button" href="/join" data-en="Join us">انضم إلينا</a></div>
+  <div class="header-actions"><button type="button" class="icon-button theme-toggle" data-theme-toggle aria-label="تبديل المظهر"><span class="sun"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg></span><span class="moon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.4 15.2A9 9 0 0 1 8.8 3.6a9 9 0 1 0 11.6 11.6Z"></path></svg></span></button><button type="button" class="lang-button" data-lang-toggle>EN</button><a class="button primary join-button" href="/join" data-en="Join us">انضم إلينا</a></div>
  </div></header>
  <main id="content"><slot /></main>
  <footer class="site-footer"><div class="footer-main">

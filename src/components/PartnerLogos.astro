@@ -1,0 +1,4 @@
+---
+const names=['أجدر','CAREER180','منارة','فلكس كورسز','جمعية الأطفال ذوي الإعاقة','جاهز','أليون','البيتزا الساخنة','شريك للنادي','نادي الهندسة الكهربائية','شريك للنادي','شريك للنادي','باندالوس','الورد الجميل','شريك للنادي','رويال البيان','Clow Studio','شركة سهول الرواد للتدريب'];
+---
+<div class="partner-logos" aria-label="جهات تعاونت مع النادي">{names.map((name,index)=><div class="partner-logo"><img src={`/admin/assets/partner-${String(index).padStart(2,'0')}.webp`} alt={name}></div>)}</div>

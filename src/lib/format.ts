@@ -1,0 +1,2 @@
+export const formatDate=(value:unknown)=>new Intl.DateTimeFormat('ar-SA-u-ca-gregory',{day:'numeric',month:'long',year:'numeric',numberingSystem:'latn'}).format(new Date(String(value)+'T12:00:00'));
+export const formatTime=(value:unknown)=>{const [hour,minute]=String(value).split(':').map(Number);return new Intl.DateTimeFormat('ar-SA',{hour:'numeric',minute:'2-digit',hour12:true,numberingSystem:'latn'}).format(new Date(2000,0,1,hour,minute));};

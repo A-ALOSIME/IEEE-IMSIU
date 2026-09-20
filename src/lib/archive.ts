@@ -1,0 +1,23 @@
+export const archiveEvents=[
+ {title:'ألعاب الفيديو بين كتابة القصة والشخصية',titleEn:'Video games: story and character',year:'2021',category:'لقاء',image:'game-storytelling.webp'},
+ {title:'كيف تختار تخصصك؟',titleEn:'How to choose your major',year:'2021',category:'لقاء',image:'choose-your-major.webp'},
+ {title:'أساسيات الأردوينو',titleEn:'Arduino fundamentals',year:'2021',category:'ورشة',image:'arduino-fundamentals.webp'},
+ {title:'مقدمة في علم البيانات',titleEn:'Introduction to data science',year:'2022',category:'ورشة',image:'introduction-data-science.webp'},
+ {title:'مهندس الشبكات',titleEn:'Network engineer',year:'2022',category:'لقاء',image:'network-engineer.webp'},
+ {title:'ما بعد التخرج',titleEn:'After graduation',year:'2022',category:'لقاء',image:'after-graduation.webp'},
+ {title:'الحوسبة السحابية',titleEn:'Cloud computing',year:'2023',category:'ورشة',image:'cloud-computing.webp'},
+ {title:'أساسيات CCNA',titleEn:'CCNA fundamentals',year:'2023',category:'ورشة',image:'ccna-fundamentals.webp'},
+ {title:'معسكر جافا الأسبوعي',titleEn:'Weekly Java camp',year:'2023',category:'معسكر',image:'java-weekly-camp.webp'},
+ {title:'أساسيات الذكاء الاصطناعي',titleEn:'AI fundamentals',year:'2024',category:'ورشة',image:'ai-fundamentals.webp'},
+ {title:'أساسيات البلوكشين',titleEn:'Blockchain fundamentals',year:'2024',category:'ورشة',image:'blockchain-fundamentals.webp'},
+ {title:'الحوسبة عالية الأداء',titleEn:'High performance computing',year:'2024',category:'لقاء',image:'high-performance-computing.webp'},
+ {title:'إدارة أنظمة لينكس',titleEn:'Linux administration',year:'2024',category:'ورشة',image:'linux-administration.webp'},
+ {title:'بايثون لتحليل البيانات',titleEn:'Python for data analysis',year:'2024',category:'ورشة',image:'python-data-analysis.webp'},
+ {title:'مقدمة في SQL',titleEn:'Introduction to SQL',year:'2024',category:'ورشة',image:'introduction-to-sql.webp'},
+ {title:'الأنظمة المشفرة',titleEn:'Cryptographic systems',year:'2024',category:'ورشة',image:'cryptographic-system.webp'},
+ {title:'التقنيات الناشئة',titleEn:'Emerging technologies',year:'2024',category:'لقاء',image:'emerging-technologies.webp'},
+ {title:'دورة الذكاء الاصطناعي',titleEn:'Artificial intelligence course',year:'2025',category:'دورة',image:'artificial-intelligence-course.webp'},
+ {title:'الخلايا الشمسية الكهروضوئية',titleEn:'Solar photovoltaics',year:'2025',category:'ورشة',image:'solar-photovoltaics.webp'},
+ {title:'المسابقة السعودية للبرمجة',titleEn:'Saudi CPC',year:'2025',category:'مسابقة',image:'saudi-cpc.webp'},
+ {title:'تعاون نادي الهندسة الكهربائية',titleEn:'Electrical Engineering Club collaboration',year:'2025',category:'تعاون',image:'electrical-engineering-collaboration.webp'}
+];

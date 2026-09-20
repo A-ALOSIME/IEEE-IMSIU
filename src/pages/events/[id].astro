@@ -1,5 +1,11 @@
 ---
-import {env} from 'cloudflare:workers';import BaseLayout from '../../layouts/BaseLayout.astro';import DynamicForm from '../../components/DynamicForm.astro';import {eventImage,publicState} from '../../lib/public-data';
-const state=await publicState(),event=state.events.find(row=>row.id===Astro.params.id&&row.status==='published');if(!event)return Astro.redirect('/events',302);const registration=event.registration==='open'&&event.mode!=='none';
+import {env} from 'cloudflare:workers';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DynamicForm from '../../components/DynamicForm.astro';
+import {eventImage,publicState} from '../../lib/public-data';
+import {formatDate,formatTime} from '../../lib/format';
+const state=await publicState(),event=state.events.find(row=>row.id===Astro.params.id&&row.status==='published');
+if(!event)return Astro.redirect('/events',302);
+const registration=event.registration==='open'&&event.mode!=='none';
 ---
-<BaseLayout title={`${event.title} | IEEE IMSIU`} description={String(event.description||event.title)}><section class="section"><div class="container prose"><img class="hero-image" src={eventImage(event)} alt={String(event.alt||event.title)}><p class="eyebrow">فعالية IEEE IMSIU</p><h1>{String(event.title)}</h1><div class="meta"><span>{String(event.date)} من {String(event.time)} إلى {String(event.endTime)}</span><span>{String(event.location||'')}</span></div><article><p>{String(event.description||'')}</p></article>{registration&&<><h2>سجّل في الفعالية</h2><DynamicForm kind="registrations" target={event.id} fields={event.fields} siteKey={env.TURNSTILE_SITE_KEY}/></>}{!registration&&<div class="empty"><p>التسجيل غير متاح حاليًا.</p></div>}</div></section></BaseLayout>
+<BaseLayout title={`${event.title} | IEEE IMSIU`} description={String(event.description||event.title)}><section class="page-hero"><div class="container prose"><div class="breadcrumbs"><a href="/" data-en="Home">الرئيسية</a> / <a href="/events" data-en="Events">الفعاليات</a></div><p class="eyebrow" data-en="IEEE IMSIU event">فعالية IEEE IMSIU</p><h1 data-en={String(event.titleEn||event.title)}>{String(event.title)}</h1><div class="meta"><span>{formatDate(event.date)} · {formatTime(event.time)} – {formatTime(event.endTime)}</span><span>{String(event.location||'')}</span></div></div></section><section class="section soft"><div class="container prose"><img class="hero-image" src={eventImage(event)} alt={String(event.alt||event.title)}><article><p>{String(event.description||'')}</p></article>{registration&&<><h2 data-en="Register for the event">سجّل في الفعالية</h2><DynamicForm kind="registrations" target={event.id} fields={event.fields} siteKey={env.TURNSTILE_SITE_KEY}/></>}{!registration&&<div class="empty"><p data-en="Registration is not available right now.">التسجيل غير متاح حاليًا.</p></div>}</div></section></BaseLayout>
